@@ -18,7 +18,7 @@ Proyecto de automatización industrial — Ingeniería Electrónica, Unidad Cent
 | HMI | Raspberry Pi con pantalla táctil, Python + Tkinter + python-snap7 |
 | Comunicación | Ethernet, protocolo S7 (Raspberry → PLC en 192.168.0.1) |
 | Actuadores | Motor del taladro, motor de la sierra, motor de la banda y 3 electroválvulas (cilindro, taladro y sierra) |
-| Tablero | Contactores para los motores, relés de estado sólido para las válvulas, guardamotor, breaker y paro de emergencia |
+| Tablero | Breaker, guardamotor, contactores para los motores, relés para las electroválvulas y paro de emergencia |
 
 ## Cómo funciona
 
@@ -34,6 +34,22 @@ Proyecto de automatización industrial — Ingeniería Electrónica, Unidad Cent
 - Máximo 3 salidas encendidas a la vez
 - **Latido de seguridad:** la HMI envía una señal de "vivo" cada 0,1 s; si deja de llegar, el PLC corta el modo manual
 
+## Entradas y salidas del PLC
+
+| Dirección | Variable | Elemento |
+| --- | --- | --- |
+| `I0.1` | Stop Emergencia | Paro de emergencia (NC) |
+| `I0.2` | Start | Pulsador de marcha (NA) |
+| `I0.3` | Stop | Pulsador de paro (NC) |
+| `I0.4` | S1 | Sensor E6 |
+| `Q0.1` | Motor_Banda | Motor de la banda, 24 VDC |
+| `Q0.2` | Piloto_Marcha | Piloto verde |
+| `Q0.5` | VB | Relé K2 → electroválvula del taladro |
+| `Q0.6` | Sierra | Contactor KM1 → motor de la sierra |
+| `Q0.7` | Taladro | Contactor KM2 → motor del taladro |
+| `Q1.0` | VA | Relé K1 → electroválvula del cilindro |
+| `Q1.1` | VC | Relé K3 → electroválvula de la sierra |
+
 ## Mapa de memoria PLC ↔ HMI
 
 | Dirección | Quién escribe | Señales |
@@ -43,7 +59,14 @@ Proyecto de automatización industrial — Ingeniería Electrónica, Unidad Cent
 | `MB12` | Raspberry (cada 0,1 s) | `M12.0` Taladro · `M12.1` Sierra · `M12.2` V. cilindro · `M12.3` V. taladro · `M12.4` V. sierra · `M12.5` Banda · `M12.7` Latido |
 | `MD14` | PLC | Conteo de piezas (DInt) |
 
-**Salidas del PLC:** `Q0.1` Banda · `Q0.5` V. taladro · `Q0.6` Sierra · `Q0.7` Taladro · `Q1.0` V. cilindro · `Q1.1` V. sierra
+## Planos eléctricos
+
+| Plano | Contenido |
+| --- | --- |
+| [Fuerza](diagramas/plano_fuerza.pdf) | Breaker, guardamotor, contactores de la sierra y el taladro, y relés de las electroválvulas |
+| [Control](diagramas/plano_control.pdf) | PLC 1214C con sus entradas (emergencia, marcha, paro y sensor), salidas a 24 VDC y 120 VAC, y la conexión Ethernet con la HMI |
+
+![Plano de control](diagramas/plano_control.png)
 
 ## Estructura
 
@@ -51,6 +74,7 @@ Proyecto de automatización industrial — Ingeniería Electrónica, Unidad Cent
 | --- | --- |
 | [`plc/`](plc) | Proyecto de TIA Portal V21 archivado (`.zap21`). Se abre con **Proyecto → Desarchivar** |
 | [`hmi/`](hmi) | Programa de la HMI para la Raspberry Pi |
+| [`diagramas/`](diagramas) | Planos de fuerza y de control en PDF y PNG |
 | [`docs/`](docs) | Fotos de la HMI y del tablero |
 
 ## Cómo ejecutar la HMI
